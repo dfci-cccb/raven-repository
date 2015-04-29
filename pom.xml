@@ -11,6 +11,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jetty.host>0.0.0.0</jetty.host>
 
     <java.source.version>1.8</java.source.version>
     <java.target.version>1.8</java.target.version>
@@ -18,7 +19,7 @@
     <org.slf4j.version>1.7.2</org.slf4j.version>
     <log4j.version>1.2.17</log4j.version>
     <junit.version>4.12</junit.version>
-    <guice.version>4.0-beta5</guice.version>
+    <guice.version>4.0</guice.version>
     <jersey.version>1.19</jersey.version>
     <jackson.version>2.5.2</jackson.version>
     <h2.version>1.4.187</h2.version>
@@ -97,6 +98,11 @@
     </dependency>
     <dependency>
       <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-multibindings</artifactId>
+      <version>${guice.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
       <artifactId>guice-persist</artifactId>
       <version>${guice.version}</version>
     </dependency>
@@ -108,11 +114,6 @@
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
-      <version>${guice.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.inject.extensions</groupId>
-      <artifactId>guice-multibindings</artifactId>
       <version>${guice.version}</version>
     </dependency>
     <dependency>
@@ -200,6 +201,7 @@
   </profiles>
 
   <build>
+    <finalName>${project.artifactId}</finalName>
     <!-- for hot reload of the web application -->
     <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
     <plugins>

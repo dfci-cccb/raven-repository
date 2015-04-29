@@ -25,7 +25,12 @@ import static java.util.logging.Logger.getLogger;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.servlet.ServletContextEvent;
+
 import org.apache.onami.scheduler.QuartzModule;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.fasterxml.jackson.module.guice.ObjectMapperModule;
@@ -70,6 +75,9 @@ public class Raven extends GuiceServletContextListener implements Module {
     SLF4JBridgeHandler.install ();
     getLogger ("global").setLevel (FINEST);
 
+    // Inject context listener
+    binder.requestInjection (this);
+
     // JSON
     binder.install (new ObjectMapperModule ());
 
@@ -84,6 +92,8 @@ public class Raven extends GuiceServletContextListener implements Module {
         scheduleJob (CranResolver.class);
         scheduleJob (BiocDevelResolver.class);
         scheduleJob (BiocReleaseResolver.class);
+
+        requestInjection (Raven.this);
       }
     });
 
@@ -104,5 +114,25 @@ public class Raven extends GuiceServletContextListener implements Module {
   @Override
   protected Injector getInjector () {
     return createInjector (this);
+  }
+
+  /**
+   * For cleanup, injected after the injector is created
+   */
+  private @Inject Scheduler scheduler;
+
+  /* (non-Javadoc)
+   * @see
+   * com.google.inject.servlet.GuiceServletContextListener#contextDestroyed
+   * (javax.servlet.ServletContextEvent) */
+  @Override
+  public void contextDestroyed (ServletContextEvent servletContextEvent) {
+    try {
+      scheduler.shutdown (true);
+    } catch (SchedulerException e) {
+      throw new RuntimeException (e);
+    } finally {
+      super.contextDestroyed (servletContextEvent);
+    }
   }
 }
